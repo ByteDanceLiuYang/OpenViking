@@ -22,6 +22,7 @@ from openviking.retrieve.context_assembler.params import (
     READ_CONCURRENCY,
     REPORTED_CATEGORY_KEYS,
 )
+from openviking.retrieve.search_type import SearchType
 from openviking.retrieve.skill_results import package_abstract, skill_root_uri
 from openviking.server.identity import RequestContext
 from openviking.utils.search_filters import merge_context_type_filter
@@ -211,6 +212,7 @@ async def gather_candidates(
     filter: Optional[Dict[str, Any]] = None,
     image_url: Optional[str] = None,
     events_time_decay_protection: Optional[str] = None,
+    search_type: SearchType = "semantic",
     peer_scope: str = "all",
     penalties: Optional[Mapping[str, float]] = None,
     excluded: Optional[Set[str]] = None,
@@ -301,6 +303,7 @@ async def gather_candidates(
             score_threshold=score_threshold,
             filter=find_filter if find_filter is not None else filter,
             image_url=image_url,
+            search_type=search_type,
             level=None,
             events_time_decay_protection=events_time_decay_protection,
         )
@@ -333,6 +336,7 @@ async def gather_candidates(
                             limit=_overfetch(quota),
                             score_threshold=score_threshold,
                             filter=bucket_filter,
+                            search_type=search_type,
                         )
                     )
                 elif filter:

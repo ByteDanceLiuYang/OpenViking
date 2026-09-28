@@ -1010,6 +1010,8 @@ class _SingleAccountBackend:
         offset: int = 0,
         filter: Optional[Dict[str, Any] | FilterExpr] = None,
         output_fields: Optional[List[str]] = None,
+        mode: Optional[str] = None,
+        fields: Optional[List[str]] = None,
     ) -> List[Dict[str, Any]]:
         try:
             if self._bound_account_id:
@@ -1025,6 +1027,8 @@ class _SingleAccountBackend:
                 self._adapter.search_by_keywords,
                 keywords=keywords,
                 query=query,
+                mode=mode,
+                fields=fields,
                 limit=limit,
                 offset=offset,
                 filter=filter,
@@ -1787,6 +1791,8 @@ class VikingVectorIndexBackend:
         output_fields: Optional[List[str]] = None,
         *,
         ctx: Optional[RequestContext] = None,
+        mode: Optional[str] = None,
+        fields: Optional[List[str]] = None,
     ) -> List[Dict[str, Any]]:
         if ctx:
             backend = await self._get_backend_for_context(ctx)
@@ -1800,6 +1806,8 @@ class VikingVectorIndexBackend:
         return await backend.search_by_keywords(
             keywords=keywords,
             query=query,
+            mode=mode,
+            fields=fields,
             limit=limit,
             offset=offset,
             filter=filter,
@@ -1923,6 +1931,37 @@ class VikingVectorIndexBackend:
             offset=offset,
             events_time_decay_protection=events_time_decay_protection,
             request_now=request_now,
+        )
+
+    async def search_by_keywords_in_tenant(
+        self,
+        ctx: RequestContext,
+        query: str,
+        context_type: Optional[str] = None,
+        target_directories: Optional[List[str]] = None,
+        extra_filter: Optional[FilterExpr | Dict[str, Any]] = None,
+        level: Optional[List[int]] = None,
+        limit: int = 10,
+        offset: int = 0,
+    ) -> List[Dict[str, Any]]:
+        acl_enabled = await self._acl_enabled(ctx)
+        scope_filter = self._build_scope_filter(
+            ctx=ctx,
+            context_type=context_type,
+            target_directories=target_directories,
+            extra_filter=extra_filter,
+            level=level,
+            acl_enabled=acl_enabled,
+        )
+        backend = await self._get_backend_for_context(ctx)
+        return await backend.search_by_keywords(
+            query=query,
+            mode="bm25",
+            fields=["content"],
+            filter=scope_filter,
+            limit=limit,
+            offset=offset,
+            output_fields=RETRIEVAL_OUTPUT_FIELDS,
         )
 
     async def filter_in_tenant(

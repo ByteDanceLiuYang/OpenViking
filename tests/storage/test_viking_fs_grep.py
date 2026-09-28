@@ -49,6 +49,25 @@ class _KeywordFailingButTagFilterWorkingStore:
         return [{"uri": "viking://resources/tagged.md"}]
 
 
+class _FulltextMetaFailureStore:
+    def __init__(self):
+        self.backend = type(
+            "Backend",
+            (),
+            {
+                "_mode": "vikingdb",
+                "collection_name": "context",
+                "index_name": "default",
+            },
+        )()
+
+    async def get_account_backend(self, _account_id):
+        return self.backend
+
+    async def get_collection_meta(self, **_kwargs):
+        raise RuntimeError("metadata unavailable")
+
+
 @pytest.fixture
 def fs(monkeypatch):
     viking_fs = VikingFS(agfs=_DummyAgfs())
@@ -287,6 +306,28 @@ async def test_collect_grep_files_propagates_root_stat_failure(monkeypatch):
 
 def test_grep_config_default_switch_to_remote_threshold_is_10000():
     assert GrepConfig().switch_to_remote_threshold == 10000
+
+
+@pytest.mark.asyncio
+async def test_fulltext_probe_keeps_grep_fallback_on_metadata_failure():
+    fs = VikingFS(agfs=_DummyAgfs())
+    ctx = RequestContext(user=UserIdentifier("account", "user"), role=Role.USER)
+
+    assert await fs._collection_has_fulltext(_FulltextMetaFailureStore(), ctx) is False
+
+
+@pytest.mark.asyncio
+async def test_fulltext_probe_propagates_metadata_failure_for_strict_callers():
+    fs = VikingFS(agfs=_DummyAgfs())
+    ctx = RequestContext(user=UserIdentifier("account", "user"), role=Role.USER)
+
+    with pytest.raises(RuntimeError, match="metadata unavailable"):
+        await fs._collection_has_fulltext(
+            _FulltextMetaFailureStore(),
+            ctx,
+            supported_modes=("vikingdb",),
+            raise_on_error=True,
+        )
 
 
 @pytest.mark.asyncio

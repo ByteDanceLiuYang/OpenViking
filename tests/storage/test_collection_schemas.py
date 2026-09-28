@@ -1535,7 +1535,7 @@ def _exercise_fetch_and_search_apis(collection):
     collection.search_by_id("default", "rec-1")
     collection.search_by_multimodal("default", text="hello")
     collection.search_by_random("default")
-    collection.search_by_keywords("default", query="hello")
+    collection.search_by_keywords("default", query="hello", mode="bm25", fields=["content"])
     collection.search_by_scalar("default", field="updated_at")
 
 
@@ -1564,6 +1564,10 @@ def test_volcengine_api_key_collection_ignores_unknown_fields_on_fetch_and_searc
         "/api/vikingdb/data/search/keywords",
         "/api/vikingdb/data/search/scalar",
     ]
+    keyword_payload = next(data for path, data in calls if path.endswith("/keywords"))
+    assert keyword_payload["query"] == "hello"
+    assert keyword_payload["mode"] == "bm25"
+    assert keyword_payload["fields"] == ["content"]
     assert all(data["ignore_unknown_fields"] is True for _, data in calls)
 
 

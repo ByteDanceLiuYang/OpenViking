@@ -185,7 +185,9 @@ class _GrepMixin:
 
         return "vikingdb_then_fs"
 
-    async def _collection_has_fulltext(self, vector_store, ctx) -> bool:
+    async def _collection_has_fulltext(
+        self, vector_store, ctx, supported_modes=None, raise_on_error: bool = False
+    ) -> bool:
         """Check if collection has content field and FullText config.
 
         The cache is scoped by Account and collection identity because one
@@ -203,6 +205,8 @@ class _GrepMixin:
             str(getattr(backend, "collection_name", getattr(backend, "_collection_name", ""))),
             str(getattr(backend, "index_name", getattr(backend, "_index_name", ""))),
         )
+        if supported_modes is not None and getattr(backend, "_mode", None) not in supported_modes:
+            return False
         if cache_key in self._fulltext_available:
             return self._fulltext_available[cache_key]
         try:
@@ -222,6 +226,17 @@ class _GrepMixin:
             self._fulltext_available[cache_key] = result
             return result
         except Exception:
+            if raise_on_error:
+                logger.error(
+                    "Failed to check collection fulltext config: "
+                    "account_id=%s backend=%s collection=%s index=%s",
+                    account_id,
+                    cache_key[1],
+                    cache_key[2],
+                    cache_key[3],
+                    exc_info=True,
+                )
+                raise
             logger.debug(
                 "Failed to check collection fulltext config, assuming no fulltext", exc_info=True
             )

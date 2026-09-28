@@ -29,6 +29,7 @@ from openviking.retrieve.context_assembler.recall_preset import (
     deprecation_stats,
     fold_recall_request,
 )
+from openviking.retrieve.search_type import SearchType
 from openviking.server.auth import get_request_context
 from openviking.server.dependencies import get_service
 from openviking.server.error_mapping import map_exception
@@ -216,6 +217,7 @@ class SearchRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     query: str = ""
+    search_type: SearchType = "semantic"
     image_url: Optional[str] = None
     target_uri: Union[str, List[str]] = ""
     context_type: Optional[Union[str, List[str]]] = None
@@ -252,6 +254,11 @@ class SearchRequest(BaseModel):
     @model_validator(mode="after")
     def _validate_mode(self) -> "SearchRequest":
         validate_event_time_decay_request(self.events_time_decay_protection)
+        if self.search_type == "keywords":
+            if not self.query.strip():
+                raise ValueError("query must not be empty when search_type='keywords'")
+            if self.image_url:
+                raise ValueError("image_url is not supported when search_type='keywords'")
         if self.mode == "list":
             error = context_only_fields_error(self.model_fields_set)
             if error:
@@ -429,6 +436,7 @@ async def _search_context(
     """Assemble an injection-ready context block for one request."""
     params = AssembleParams(
         query=request.query,
+        search_type=request.search_type,
         image_url=_resolve_image_url(request.image_url, ctx),
         limit=actual_limit,
         score_threshold=request.score_threshold,
@@ -501,6 +509,7 @@ async def search(
             await session.load()
         return await service.search.search(
             query=request.query,
+            search_type=request.search_type,
             ctx=_ctx,
             target_uri=resolved_target_uri,
             session=session,
