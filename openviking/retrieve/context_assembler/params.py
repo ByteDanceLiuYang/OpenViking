@@ -7,7 +7,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any, Dict, Literal, Mapping, Optional, Sequence, Tuple, Union
 
-from openviking.retrieve.search_type import SearchType
+from openviking.core.retrieval_types import SearchType
 
 Detail = Literal["abstract", "overview", "full"]
 # "auto" no longer selects a strategy; it is accepted as a synonym for "unset".

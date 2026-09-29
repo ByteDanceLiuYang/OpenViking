@@ -14,6 +14,7 @@ from typing import Any, Dict, List, Mapping, Optional, Sequence, Set, Tuple
 
 from openviking.core.namespace import AGENT_SKILLS_ROOT, canonical_user_root
 from openviking.core.retrieval_targets import default_target_directories
+from openviking.core.retrieval_types import SearchType
 from openviking.retrieve.context_assembler.params import (
     MEMORY_CATEGORIES,
     ORIGIN_ORDER,
@@ -22,7 +23,6 @@ from openviking.retrieve.context_assembler.params import (
     READ_CONCURRENCY,
     REPORTED_CATEGORY_KEYS,
 )
-from openviking.retrieve.search_type import SearchType
 from openviking.retrieve.skill_results import package_abstract, skill_root_uri
 from openviking.server.identity import RequestContext
 from openviking.utils.search_filters import merge_context_type_filter

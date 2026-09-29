@@ -225,10 +225,16 @@ class _AsyncVectorAdapter:
                 self._closed = True
                 self._adapter.close()
 
-    async def collection_meta(self, index_name: str) -> Dict[str, Any]:
+    async def collection_meta(
+        self, index_name: str, *, raise_on_error: bool = False
+    ) -> Dict[str, Any]:
         def _get() -> Dict[str, Any]:
             collection = self._adapter.get_collection()
-            meta = collection.get_meta_data() or {}
+            meta = (
+                collection.get_meta_data(raise_on_error=True)
+                if raise_on_error
+                else collection.get_meta_data()
+            ) or {}
             if self._adapter.mode in {"local", "cuvs"}:
                 index_meta = collection.get_index_meta_data(index_name) or {}
                 if "ScalarIndex" in index_meta:
@@ -513,10 +519,15 @@ class _SingleAccountBackend:
         }
 
     @_backend_operation
-    async def get_collection_meta(self) -> Optional[Dict[str, Any]]:
+    async def get_collection_meta(
+        self, *, raise_on_error: bool = False
+    ) -> Optional[Dict[str, Any]]:
         if not await self.collection_exists():
             return None
-        return await self._async_adapter.collection_meta(self._index_name)
+        return await self._async_adapter.collection_meta(
+            self._index_name,
+            raise_on_error=raise_on_error,
+        )
 
     @_backend_operation
     async def update_collection_description(self, description: str) -> bool:
@@ -1254,12 +1265,13 @@ class VikingVectorIndexBackend:
         self,
         *,
         ctx: Optional[RequestContext] = None,
+        raise_on_error: bool = False,
     ) -> Optional[Dict[str, Any]]:
         if ctx:
             backend = await self._get_backend_for_context(ctx)
         else:
             backend = self._get_default_backend()
-        return await backend.get_collection_meta()
+        return await backend.get_collection_meta(raise_on_error=raise_on_error)
 
     async def update_collection_description(self, description: str) -> bool:
         return await self._get_default_backend().update_collection_description(description)

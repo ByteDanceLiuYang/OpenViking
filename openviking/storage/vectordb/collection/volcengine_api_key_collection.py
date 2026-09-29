@@ -245,7 +245,7 @@ class VolcengineApiKeyCollection(ICollection):
             "volcengine api_key mode is data-plane only; update is not supported"
         )
 
-    def get_meta_data(self):
+    def get_meta_data(self, *, raise_on_error: bool = False):
         from openviking.storage.collection_schemas import CollectionSchemas
 
         schema = CollectionSchemas.context_collection(

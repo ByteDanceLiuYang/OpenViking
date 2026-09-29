@@ -8,7 +8,7 @@ from typing import Any, Dict, List, Optional, Union
 
 from openviking.core.context import ContextLevel
 from openviking.core.retrieval_targets import resolve_retrieval_targets
-from openviking.retrieve.search_type import SearchType
+from openviking.core.retrieval_types import SearchType
 from openviking.server.error_mapping import is_not_found_error, map_exception
 from openviking.server.identity import RequestContext
 from openviking.storage.abstract_overview import (

@@ -43,6 +43,7 @@ from starlette.types import ASGIApp, Receive, Scope, Send
 
 from openviking.core.path_variables import resolve_path_variables
 from openviking.core.retrieval_targets import default_target_directories
+from openviking.core.retrieval_types import SearchType
 from openviking.core.uri_validation import (
     validate_content_target_uri,
     validate_request_viking_uri,
@@ -55,7 +56,6 @@ from openviking.retrieve.context_assembler import (
     AssembleParams,
     assemble_context,
 )
-from openviking.retrieve.search_type import SearchType
 from openviking.retrieve.skill_results import skill_root_uri
 from openviking.server.auth import (
     _build_request_context,

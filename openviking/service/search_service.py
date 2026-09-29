@@ -8,7 +8,7 @@ Provides search operations: search, find.
 
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 
-from openviking.retrieve.search_type import SearchType
+from openviking.core.retrieval_types import SearchType
 from openviking.server.identity import RequestContext
 from openviking.storage.viking_fs import VikingFS
 from openviking.utils.image_search import (

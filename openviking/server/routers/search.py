@@ -11,6 +11,7 @@ from fastapi import Response as FastAPIResponse
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from openviking.core.path_variables import resolve_path_variables
+from openviking.core.retrieval_types import SearchType
 from openviking.core.uri_validation import validate_request_viking_uri
 from openviking.pyagfs.exceptions import AGFSClientError, AGFSNotFoundError
 from openviking.retrieve.context_assembler import (
@@ -29,7 +30,6 @@ from openviking.retrieve.context_assembler.recall_preset import (
     deprecation_stats,
     fold_recall_request,
 )
-from openviking.retrieve.search_type import SearchType
 from openviking.server.auth import get_request_context
 from openviking.server.dependencies import get_service
 from openviking.server.error_mapping import map_exception

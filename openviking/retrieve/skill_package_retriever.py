@@ -6,10 +6,10 @@ import math
 import time
 from typing import Optional
 
+from openviking.core.retrieval_types import SearchType
 from openviking.models.embedder.base import embed_compat
 from openviking.retrieve.hierarchical_retriever import HierarchicalRetriever
 from openviking.retrieve.retrieval_stats import get_stats_collector
-from openviking.retrieve.search_type import SearchType
 from openviking.retrieve.skill_results import SkillResultResolver, candidate_key, pagination_key
 from openviking.server.identity import RequestContext
 from openviking.storage.vikingdb_manager import VikingDBManagerProxy

@@ -271,7 +271,7 @@ class Collection:
             raise RuntimeError("Collection is closed")
         self.__collection.end_bulk_ingest()
 
-    def get_meta_data(self) -> Dict[str, Any]:
+    def get_meta_data(self, *, raise_on_error: bool = False) -> Dict[str, Any]:
         """
         Retrieve the full metadata of the collection.
 
@@ -281,6 +281,8 @@ class Collection:
         """
         if self.__collection is None:
             raise RuntimeError("Collection is closed")
+        if raise_on_error:
+            return self.__collection.get_meta_data(raise_on_error=True)
         return self.__collection.get_meta_data()
 
     def get_meta(self) -> Dict[str, Any]:

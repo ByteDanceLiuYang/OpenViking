@@ -12,10 +12,10 @@ from typing import Any, Dict, List, Optional
 
 from openviking.core.context import ContextLevel
 from openviking.core.retrieval_targets import default_target_directories
+from openviking.core.retrieval_types import SearchType
 from openviking.models.embedder.base import EmbedResult, embed_compat
 from openviking.models.rerank import RerankClient
 from openviking.retrieve.retrieval_stats import get_stats_collector
-from openviking.retrieve.search_type import SearchType
 from openviking.server.identity import RequestContext
 from openviking.storage.abstract_overview import AbstractOverviewFormatError, body_for_preview
 from openviking.storage.expr import FilterExpr
